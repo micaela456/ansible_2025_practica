@@ -67,7 +67,7 @@ Configura el servidor `debian-node1` para que aloje la base de datos. Debe:\
 ✅ Crear el usuario `ansible` con contraseña `credicoop`.  
 ✅ Asignar permisos sobre `flaskdb` al usuario `ansible`.  
 
-📌 **Variables Sugeridas (`roles/postgresql/vars/main.yml`)**
+**Variables Sugeridas (`roles/postgresql/vars/main.yml`)**
 ```yaml
 db_host: debian-node1
 db_name: flaskdb
@@ -81,6 +81,71 @@ postgresql_packages:
 postgresql_dependencies:
   - python3-psycopg2
   - python3-apt
+```
+**Template postgresql.conf (`roles/postgresql/templates/postgresql.conf.j2`)**
+
+```conf
+# -----------------------------
+# PostgreSQL configuration file
+# -----------------------------
+
+data_directory = '/var/lib/postgresql/13/main'          # use data in another directory
+                                        # (change requires restart)
+hba_file = '/etc/postgresql/13/main/pg_hba.conf'        # host-based authentication file
+                                        # (change requires restart)
+ident_file = '/etc/postgresql/13/main/pg_ident.conf'    # ident configuration file
+                                        # (change requires restart)
+external_pid_file = '/var/run/postgresql/13-main.pid'                   
+port = 5432                             # (change requires restart)
+max_connections = 100                   # (change requires restart)
+unix_socket_directories = '/var/run/postgresql' # comma-separated list of directories
+ssl = on
+ssl_cert_file = '/etc/ssl/certs/ssl-cert-snakeoil.pem'
+ssl_key_file = '/etc/ssl/private/ssl-cert-snakeoil.key'
+shared_buffers = 128MB                  # min 128kB
+dynamic_shared_memory_type = posix      # the default is the first option
+max_wal_size = 1GB
+min_wal_size = 80MB
+log_line_prefix = '%m [%p] %q%u@%d '            # special values:
+
+#------------------------------------------------------------------------------
+# CONFIG FILE INCLUDES
+#------------------------------------------------------------------------------
+
+include_dir = 'conf.d'                  # include files ending in '.conf' from
+
+
+
+#------------------------------------------------------------------------------
+# CUSTOMIZED OPTIONS
+#------------------------------------------------------------------------------
+
+# Add settings for extensions here
+listen_addresses = '*'
+```
+
+**Template pg_hba.conf (`roles/postgresql/templates/pg_hba.conf.j2`)**
+
+```conf
+# PostgreSQL Client Authentication Configuration File
+# ===================================================
+
+local   all             postgres                                peer
+
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# "local" is for Unix domain socket connections only
+local   all             all                                     peer
+# IPv4 local connections:
+host    all             all             127.0.0.1/32            md5
+# IPv6 local connections:
+host    all             all             ::1/128                 md5
+# Allow replication connections from localhost, by a user with the
+# replication privilege.
+local   replication     all                                     peer
+host    replication     all             127.0.0.1/32            md5
+host    replication     all             ::1/128                 md5
+host    all    all    0.0.0.0/0    md5
 ```
 
 
