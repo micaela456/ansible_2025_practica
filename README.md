@@ -23,7 +23,9 @@ El laboratorio se compone de **tres máquinas virtuales**:
  **Acceso a las máquinas:**
 - Usuario: `ansible`  
 - Contraseña: `credicoop`  
-- Acceso SSH con llaves preconfigurado.  
+- Acceso SSH con llaves preconfigurado
+
+**Recomiendo para simplificar el desarrollo utilizar mismo usuario y contraseña para configurar flask y postgresql**
 
 ## **3. Estructura de Carpetas en Ansible**
 El código de Ansible debe organizarse con la siguiente estructura:
