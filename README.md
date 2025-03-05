@@ -56,7 +56,7 @@ El objetivo es **automatizar el despliegue** de una aplicación Flask con Postgr
 ## **5. Tareas a Realizar**
 
 ### **Configuración de PostgreSQL**
-Configura el servidor `debian-node1` para que aloje la base de datos. Debe:
+Configura el servidor `debian-node1` para que aloje la base de datos. Debe:\
 ✅ Instalar **PostgreSQL 13** y sus dependencias.  
 ✅ Permitir conexiones remotas.  
 ✅ Crear la base de datos `flaskdb`.  
