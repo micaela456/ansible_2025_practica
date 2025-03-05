@@ -111,7 +111,7 @@ gunicorn
 
 
 ### **Configurar Flask y Gunicorn**
-El código de la aplicación Flask se encuentra en un template que deberás copiar a `app.py` en el servidor web.
+El código de la aplicación Flask se encuentra en un template que deberán copiar a `app.py` en el servidor web.
 
 **Template Flask (`roles/webapp/templates/app.py.j2`)**
 ```python
@@ -150,6 +150,8 @@ if __name__ == '__main__':
 ---
 
 ### **Interfaz Gráfica**
+Debajo se encuentran los templates para el index y el css, deberás copiarlos a los directorios correspondientes en el servidor web.
+
 📌 **Template HTML (`roles/webapp/templates/index.html.j2`)**
 ```html
 <!DOCTYPE html>
@@ -201,7 +203,7 @@ button {
 ---
 
 ## **6. Validación**
-Una vez desplegado el entorno, prueba:
+Una vez desplegado el entorno, prueben:
 ```bash
 curl http://ubuntu-node2:5000
 ```
