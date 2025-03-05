@@ -1,0 +1,77 @@
+---
+- name: Install webapp packages
+  apt:
+    name: "{{ webapp_packages }}"
+    state: present
+  become: yes
+
+- name: Create webapp user
+  user:
+    name: "{{ webapp_user }}"
+    group: "{{ webapp_group }}"
+    create_home: yes
+    system: yes
+  become: yes
+
+- name: Create webapp directory
+  file:
+    path: "{{ webapp_directory }}"
+    state: directory
+    owner: "{{ webapp_user }}"
+    group: "{{ webapp_group }}"
+  become: yes
+
+- name: Create virtual environment
+  command: python3 -m venv "{{ webapp_directory }}/venv"
+  become: yes
+  become_user: "{{ webapp_user }}"
+
+- name: Install Python dependencies
+  pip:
+    requirements: "{{ webapp_directory }}/requirements.txt"
+    virtualenv: "{{ webapp_directory }}/venv"
+  become: yes
+  become_user: "{{ webapp_user }}"
+
+- name: Copy Flask application
+  copy:
+    src: app.py
+    dest: "{{ webapp_directory }}/app.py"
+    owner: "{{ webapp_user }}"
+    group: "{{ webapp_group }}"
+  become: yes
+
+- name: Copy Gunicorn service file
+  template:
+    src: gunicorn.service.j2
+    dest: /etc/systemd/system/gunicorn.service
+  become: yes
+  notify: restart_gunicorn
+
+- name: Start Gunicorn service
+  systemd:
+    name: gunicorn
+    state: started
+    enabled: yes
+  become: yes
+
+- name: Configure Nginx
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/sites-available/webapp
+  become: yes
+
+- name: Enable Nginx site
+  file:
+    src: /etc/nginx/sites-available/webapp
+    dest: /etc/nginx/sites-enabled/webapp
+    state: link
+  become: yes
+  notify: restart_nginx
+
+- name: Restart Nginx
+  service:
+    name: nginx
+    state: restarted
+  become: yes
+  listen: restart_nginx
