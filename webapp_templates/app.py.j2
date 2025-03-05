@@ -1,0 +1,36 @@
+from flask import Flask, render_template
+import psycopg2
+
+app = Flask(__name__, template_folder="/opt/webapp/templates", static_folder="/opt/webapp/static")
+
+def get_db_connection():
+    conn = psycopg2.connect(
+        dbname="{{ db_name }}",
+        user="{{ db_user }}",
+        password="{{ db_password }}",
+        host="{{ db_host }}"
+    )
+    return conn
+
+@app.route('/')
+def home():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    # Asegurarse de que la tabla existe
+    cur.execute('CREATE TABLE IF NOT EXISTS visits (id SERIAL PRIMARY KEY, timestamp TIMESTAMP DEFAULT now());')
+    conn.commit()
+
+    # Insertar una nueva visita
+    cur.execute('INSERT INTO visits DEFAULT VALUES RETURNING id;')
+    last_id = cur.fetchone()[0]
+    conn.commit()
+
+    # Contar el total de visitas
+    cur.execute('SELECT COUNT(*) FROM visits;')
+    count = cur.fetchone()[0]
+    
+    cur.close()
+    conn.close()
+
+    return render_template('index.html', visits=count)
