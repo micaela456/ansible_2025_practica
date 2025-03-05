@@ -232,7 +232,7 @@ Debe mostrar:
 O pueden acceder desde un navegador a la url http://ubuntu-node2:5000 / http://[ip-ubuntu-node2]:5000
 
 
-# **7. Documentación Relevante**
+## **7. Documentación Relevante**
 ### 🔹 **Ansible**
 - **Conceptos básicos de Ansible** → [https://docs.ansible.com/ansible/latest/user_guide/intro_getting_started.html](https://docs.ansible.com/ansible/latest/user_guide/intro_getting_started.html)
 - **Organización de roles en Ansible** → [https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html)
