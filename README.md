@@ -41,8 +41,10 @@ ansible-lab/
 │   │   ├── vars/
 │   ├── postgresql/    # Configuración del Servidor de Base de Datos
 │   │   ├── tasks/
+│   │   ├── templates/
 │   │   ├── handlers/
 │   │   ├── vars/
+
 ```
 **Reglas obligatorias:**
 - **No escribir lógica en `site.yml`**. Todo debe estar en roles.
