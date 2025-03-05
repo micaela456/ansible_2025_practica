@@ -221,7 +221,7 @@ if __name__ == '__main__':
 ### **Interfaz Gráfica**
 Debajo se encuentran los templates para el index y el css, deberás copiarlos a los directorios correspondientes en el servidor web.
 
-📌 **Template HTML (`roles/webapp/templates/index.html.j2`)**
+**Template HTML (`roles/webapp/templates/index.html.j2`)**
 ```html
 <!DOCTYPE html>
 <html lang="es">
