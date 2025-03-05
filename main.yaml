@@ -1,0 +1,56 @@
+---
+- name: Instalar paquetes de PostgreSQL # Install PostgreSQL packages
+  ansible.builtin.apt:
+    name: "{{ postgresql_packages }}" # Lista de paquetes a instalar (postgresql, postgresql-contrib)
+    state: present # Asegura que los paquetes estén instalados
+  become: yes # Ejecuta la tarea con privilegios de root
+
+- name: Instalar dependencias de PostgreSQL # Install PostgreSQL dependencies
+  ansible.builtin.apt:
+    name: "{{ postgresql_dependencies }}" # Lista de dependencias (python3-psycopg2, python3-apt)
+    state: present # Asegura que las dependencias estén instaladas
+  become: yes # Ejecuta la tarea con privilegios de root
+
+- name: Permitir conexiones remotas # Allow remote connections
+  ansible.builtin.lineinfile:
+    path: "/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf" # Ruta al archivo de configuración de PostgreSQL
+    regexp: "^#listen_addresses = 'localhost'" # Expresión regular para encontrar la línea a modificar
+    line: "listen_addresses = '*'" # Reemplaza la línea para permitir conexiones desde cualquier IP
+  become: yes # Ejecuta la tarea con privilegios de root
+  notify: restart_postgresql # Notifica al handler para reiniciar PostgreSQL
+
+- name: Permitir conexiones remotas en pg_hba.conf # Allow remote connections in pg_hba.conf
+  ansible.builtin.lineinfile:
+    path: "/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf" # Ruta al archivo de configuración de acceso de PostgreSQL
+    line: "host all all 0.0.0.0/0 md5" # Agrega una línea para permitir conexiones desde cualquier IP con autenticación MD5
+  become: yes # Ejecuta la tarea con privilegios de root
+  notify: restart_postgresql # Notifica al handler para reiniciar PostgreSQL
+
+- name: Crear usuario de PostgreSQL # Create PostgreSQL user
+  become: yes # Ejecuta la tarea con privilegios de root
+  become_user: postgres # Ejecuta la tarea como el usuario 'postgres'
+  postgresql_user:
+    name: "{{ db_user }}" # Nombre del usuario a crear (ansible)
+    password: "{{ db_password }}" # Contraseña del usuario (credicoop)
+
+- name: Crear base de datos de PostgreSQL # Create PostgreSQL database
+  become: yes # Ejecuta la tarea con privilegios de root
+  become_user: postgres # Ejecuta la tarea como el usuario 'postgres'
+  postgresql_db:
+    name: "{{ db_name }}" # Nombre de la base de datos a crear (flaskdb)
+    owner: "{{ db_user }}" # Establece el propietario de la base de datos (ansible)
+
+- name: Otorgar privilegios al usuario en la base de datos # Grant privileges to user on database
+  become: yes # Ejecuta la tarea con privilegios de root
+  become_user: postgres # Ejecuta la tarea como el usuario 'postgres'
+  postgresql_privs:
+    db: "{{ db_name }}" # Nombre de la base de datos
+    priv: "ALL" # Otorga todos los privilegios
+    role: "{{ db_user }}" # Usuario al que se otorgan los privilegios
+
+- name: Reiniciar PostgreSQL # Restart PostgreSQL
+  ansible.builtin.service:
+    name: postgresql # Nombre del servicio PostgreSQL
+    state: restarted # Reinicia el servicio
+  become: yes # Ejecuta la tarea con privilegios de root
+  listen: restart_postgresql # Escucha la notificación 'restart_postgresql' (del handler)
